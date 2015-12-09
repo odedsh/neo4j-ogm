@@ -14,6 +14,8 @@
 
 package org.neo4j.ogm.drivers.embedded.request;
 
+import java.util.HashMap;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -34,8 +36,6 @@ import org.neo4j.ogm.response.Response;
 import org.neo4j.ogm.transaction.TransactionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
 
 /**
  * @author vince
@@ -67,6 +67,11 @@ public class EmbeddedRequest implements Request {
             return new EmptyResponse();
         }
         return new RowModelResponse(executeRequest(request), transactionManager);
+    }
+
+    @Override
+    public Response<RowModel> execute(DefaultRequest query) {
+        return null;
     }
 
     @Override

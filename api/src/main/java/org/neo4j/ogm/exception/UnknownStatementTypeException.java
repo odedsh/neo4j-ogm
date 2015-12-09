@@ -12,21 +12,14 @@
  *
  */
 
-package org.neo4j.ogm.compiler;
-
-import java.util.Map;
+package org.neo4j.ogm.exception;
 
 /**
- * @author Vince Bickers
+ * @author Luanne Misquitta
  */
-public interface CypherEmitter {
+public class UnknownStatementTypeException extends RuntimeException{
 
-    /**
-     * Emits one or more Cypher clauses.
-     *
-     * @param queryBuilder The {@code StringBuilder} to which the Cypher should be appended
-     * @param parameters A {@link Map} to which Cypher parameter values may optionally be added as the query is built up
-     */
-
-    void emit(StringBuilder queryBuilder, Map<String, Object> parameters);
+	public UnknownStatementTypeException(String message) {
+		super(message);
+	}
 }

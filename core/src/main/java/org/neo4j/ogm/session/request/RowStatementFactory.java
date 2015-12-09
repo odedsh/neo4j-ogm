@@ -12,21 +12,19 @@
  *
  */
 
-package org.neo4j.ogm.compiler;
+package org.neo4j.ogm.session.request;
 
 import java.util.Map;
 
+import org.neo4j.ogm.request.StatementFactory;
+
 /**
- * @author Vince Bickers
+ * @author Luanne Misquitta
  */
-public interface CypherEmitter {
+public class RowStatementFactory implements StatementFactory<RowDataStatement> {
 
-    /**
-     * Emits one or more Cypher clauses.
-     *
-     * @param queryBuilder The {@code StringBuilder} to which the Cypher should be appended
-     * @param parameters A {@link Map} to which Cypher parameter values may optionally be added as the query is built up
-     */
-
-    void emit(StringBuilder queryBuilder, Map<String, Object> parameters);
+	@Override
+	public RowDataStatement statement(String statement, Map<String, Object> parameters) {
+		return new RowDataStatement(statement, parameters);
+	}
 }

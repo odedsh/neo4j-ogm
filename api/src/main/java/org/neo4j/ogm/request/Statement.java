@@ -7,7 +7,11 @@ import java.util.Map;
  */
 public interface Statement {
 
-    public String getStatement();
+    String getStatement();
 
-    public Map<String, Object> getParameters();
+    Map<String, Object> getParameters();
+
+    String[] getResultDataContents();
+
+    boolean isIncludeStats();
 }

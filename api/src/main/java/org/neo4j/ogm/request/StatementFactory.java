@@ -12,21 +12,16 @@
  *
  */
 
-package org.neo4j.ogm.compiler;
+package org.neo4j.ogm.request;
 
 import java.util.Map;
 
 /**
- * @author Vince Bickers
+ * Constructs Statements of a particular type.
+ *
+ * @author Luanne Misquitta
  */
-public interface CypherEmitter {
+public interface StatementFactory<T> {
 
-    /**
-     * Emits one or more Cypher clauses.
-     *
-     * @param queryBuilder The {@code StringBuilder} to which the Cypher should be appended
-     * @param parameters A {@link Map} to which Cypher parameter values may optionally be added as the query is built up
-     */
-
-    void emit(StringBuilder queryBuilder, Map<String, Object> parameters);
+	Statement statement(String statement, Map<String, Object> parameters);
 }

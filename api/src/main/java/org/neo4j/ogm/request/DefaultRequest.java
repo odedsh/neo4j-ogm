@@ -12,21 +12,15 @@
  *
  */
 
-package org.neo4j.ogm.compiler;
+package org.neo4j.ogm.request;
 
-import java.util.Map;
+import java.util.List;
 
 /**
- * @author Vince Bickers
+ * @author Luanne Misquitta
  */
-public interface CypherEmitter {
+public interface DefaultRequest {
 
-    /**
-     * Emits one or more Cypher clauses.
-     *
-     * @param queryBuilder The {@code StringBuilder} to which the Cypher should be appended
-     * @param parameters A {@link Map} to which Cypher parameter values may optionally be added as the query is built up
-     */
+	List<Statement> getStatements();
 
-    void emit(StringBuilder queryBuilder, Map<String, Object> parameters);
 }

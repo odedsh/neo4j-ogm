@@ -14,19 +14,24 @@
 
 package org.neo4j.ogm.compiler;
 
-import java.util.Map;
+import java.util.Collection;
+
+import org.neo4j.ogm.model.Node;
 
 /**
- * @author Vince Bickers
+ * Builds a node to be persisted in the database.
+ *
+ * @author Luanne Misquitta
  */
-public interface CypherEmitter {
+public interface NodeBuilder {
 
-    /**
-     * Emits one or more Cypher clauses.
-     *
-     * @param queryBuilder The {@code StringBuilder} to which the Cypher should be appended
-     * @param parameters A {@link Map} to which Cypher parameter values may optionally be added as the query is built up
-     */
+	Long reference();
 
-    void emit(StringBuilder queryBuilder, Map<String, Object> parameters);
+	NodeBuilder addProperty(String key, Object value);
+
+	NodeBuilder setLabels(Collection<String> labels);
+
+	String[] labels();
+
+	Node node();
 }

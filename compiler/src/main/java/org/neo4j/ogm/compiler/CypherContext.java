@@ -1,25 +1,19 @@
 /*
- * Copyright (c) 2002-2015 "Neo Technology,"
- * Network Engine for Objects in Lund AB [http://neotechnology.com]
+ * Copyright (c)  [2011-2015] "Neo Technology" / "Graph Aware Ltd."
  *
  * This product is licensed to you under the Apache License, Version 2.0 (the "License").
  * You may not use this product except in compliance with the License.
  *
- * This product may include a number of subcomponents with
- * separate copyright notices and license terms. Your use of the source
- * code for these subcomponents is subject to the terms and
- * conditions of the subcomponent's license, as noted in the LICENSE file.
+ * This product may include a number of subcomponents with separate copyright notices and license terms. Your use of the source code for these subcomponents is subject to the terms and conditions of the subcomponent's license, as noted in the LICENSE file.
+ *
  *
  */
 
-package org.neo4j.ogm.compiler.v2;
-
-import org.neo4j.ogm.compiler.CompileContext;
-import org.neo4j.ogm.compiler.NodeEmitter;
-import org.neo4j.ogm.mapper.Mappable;
-import org.neo4j.ogm.request.Statement;
+package org.neo4j.ogm.compiler;
 
 import java.util.*;
+
+import org.neo4j.ogm.mapper.Mappable;
 
 /**
  * Maintains contextual information throughout the process of compiling Cypher statements to persist a graph of objects.
@@ -28,26 +22,31 @@ import java.util.*;
  * @author Vince Bickers
  * @author Luanne Misquitta
  */
-class CypherContext implements CompileContext {
+public class CypherContext implements CompileContext {
 
-    private final Map<Long, NodeEmitter> visitedObjects = new HashMap<>();
+    private final Map<Long, NodeBuilder> visitedObjects = new HashMap<>();
     private final Set<Long> visitedRelationshipEntities = new HashSet<>();
 
-    private final Map<String, Object> createdObjects = new HashMap<>();
+    private final Map<Long, Object> createdObjectsWithId = new HashMap<>();
     private final Collection<Mappable> registeredRelationships = new HashSet<>();
     private final Collection<Mappable> deletedRelationships = new HashSet<>();
-
+    private final Map<Long, Long> newNodeIds = new HashMap<>();
 
     private final Collection<Object> log = new HashSet<>();
 
-    private List<Statement> statements;
+    private final Compiler compiler;
+
+    public CypherContext(Compiler compiler) {
+        this.compiler = compiler;
+    }
 
     public boolean visited(Long obj) {
         return this.visitedObjects.containsKey(obj);
     }
 
-    public void visit(Long toPersist, NodeEmitter nodeBuilder) {
-        this.visitedObjects.put(toPersist, nodeBuilder);
+    @Override
+    public void visit(Long identity, NodeBuilder nodeBuilder) {
+        this.visitedObjects.put(identity, nodeBuilder);
     }
 
     public void registerRelationship(Mappable mappedRelationship) {
@@ -58,24 +57,19 @@ class CypherContext implements CompileContext {
         return this.registeredRelationships.remove(mappedRelationship);
     }
 
-    public NodeEmitter nodeEmitter(Long obj) {
-        return this.visitedObjects.get(obj);
+    @Override
+    public NodeBuilder visitedNode(Long identity) {
+        return this.visitedObjects.get(identity);
     }
 
-    public void setStatements(List<Statement> statements) {
-        this.statements = statements;
+    @Override
+    public void registerNewObject(Long reference, Object relationshipEntity) {
+        createdObjectsWithId.put(reference, relationshipEntity);
     }
 
-    public List<Statement> getStatements() {
-        return this.statements;
-    }
-
-    public void registerNewObject(String cypherName, Object toPersist) {
-        createdObjects.put(cypherName, toPersist);
-    }
-
-    public Object getNewObject(String cypherName) {
-        return createdObjects.get(cypherName);
+    @Override
+    public Object getNewObject(Long id) {
+        return createdObjectsWithId.get(id);
     }
 
     public void register(Object object) {
@@ -195,6 +189,27 @@ class CypherContext implements CompileContext {
 
     public boolean visitedRelationshipEntity(Long relationshipEntity) {
         return visitedRelationshipEntities.contains(relationshipEntity);
+    }
+
+    public Compiler getCompiler() {
+        return compiler;
+    }
+
+    public Long newNodeId(Long reference) {
+        if (newNodeIds.containsKey(reference)) {
+            return newNodeIds.get(reference);
+        }
+        return reference;
+    }
+
+    @Override
+    public void registerNewNodeId(Long reference, Long id) {
+        newNodeIds.put(reference, id);
+    }
+
+    @Override
+    public void deregister(NodeBuilder nodeBuilder) {
+        compiler.unmap(nodeBuilder);
     }
 
     private boolean isMappableAlreadyDeleted(Mappable mappedRelationship) {
